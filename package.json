@@ -1,0 +1,34 @@
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx --yes serve@14.2.6 out",
+    "lint": "eslint",
+    "figurine": "blender -b --factory-startup -P blender/build_rb9_figurine.py -- --out public/models/rb9.glb && npx --yes @gltf-transform/cli@4.5.1 meshopt public/models/rb9.glb public/models/rb9.glb --level medium",
+    "posters": "next build && node scripts/capture-posters.mjs",
+    "backdrops": "uv run scripts/build_backdrops.py"
+  },
+  "dependencies": {
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.1",
+    "@react-three/postprocessing": "3.1.3",
+    "next": "16.3.7",
+    "postprocessing": "6.39.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "0.186.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.7",
+    "puppeteer-core": "25.12.0",
+    "typescript": "^5"
+  }
+}

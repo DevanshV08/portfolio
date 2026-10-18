@@ -1,0 +1,103 @@
+/* Explained terms: a dotted underline in sentences, a quiet hint on chips,
+   and a broadcast-style caption card above (or below) the term. */
+
+.term,
+.chipTerm {
+  --tip-shift: 0px;
+  position: relative;
+  cursor: help;
+  outline-offset: 2px;
+}
+
+.term {
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in srgb, var(--yellow) 70%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.term:hover,
+.term:focus-visible {
+  color: var(--ink);
+  text-decoration-color: var(--yellow);
+}
+
+.chipTerm {
+  display: inline-block;
+}
+
+.chipTerm::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: -3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--yellow) 70%, transparent);
+}
+
+.tip {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  width: max-content;
+  max-width: min(300px, calc(100vw - 24px));
+  padding: 9px 12px 10px;
+  border-left: 3px solid var(--yellow);
+  background: #0b1128;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(242, 243, 247, 0.12);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+  color: var(--ink-dim);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(calc(-50% + var(--tip-shift)), 4px);
+  transition: opacity 0.16s, transform 0.2s var(--ease-brake), visibility 0.16s;
+}
+
+.tip b {
+  display: block;
+  margin-bottom: 2px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.tipExtra {
+  display: block;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-style: normal;
+  color: var(--ink);
+}
+
+.term[data-below] .tip,
+.chipTerm[data-below] .tip {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+
+.term:hover .tip,
+.term:focus-visible .tip,
+.chipTerm:hover .tip,
+.chipTerm:focus-visible .tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(calc(-50% + var(--tip-shift)), 0);
+}

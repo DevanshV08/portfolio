@@ -1,0 +1,447 @@
+/* Section-sized charts for the coverage: the career strategy chart and the
+   skills proof map. Same visual language as the small graphics. */
+
+.chartCaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.chartCaption span {
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #0a0a0a;
+  background: var(--yellow);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+/* ---------- Strategy chart ---------- */
+
+.stints {
+  margin: 0 0 30px;
+  padding: 16px 18px 18px;
+  background: rgba(5, 7, 15, 0.72);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+
+.stintGrid {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.9fr) repeat(var(--years), minmax(0, 1fr));
+  grid-template-rows: auto repeat(var(--rows), auto);
+  row-gap: 7px;
+}
+
+/* A rule down each year column, behind the stints. */
+.rule {
+  border-left: 1px solid var(--line);
+}
+
+.yearHead {
+  padding: 0 0 6px 6px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+
+.stintLabel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding-right: 10px;
+  line-height: 1.15;
+}
+
+.stintLabel b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.stintLabel span {
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ink-dim);
+}
+
+.stintBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  margin: 3px 3px;
+  padding: 0 10px 0 4px;
+  border-radius: 13px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #0a0a0a;
+  background: linear-gradient(90deg, var(--yellow), #ffd93d);
+  transform-origin: left;
+}
+
+/* The tyre-compound disc at the start of each stint. */
+.compound {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0b1128;
+  box-shadow: inset 0 0 0 3px #f5c400, inset 0 0 0 5px #0b1128;
+}
+
+.stintBar[data-ongoing="true"] {
+  background: linear-gradient(90deg, var(--green), rgba(25, 195, 107, 0.55) 80%, rgba(25, 195, 107, 0.15));
+  border-radius: 13px 0 0 13px;
+}
+
+.stintBar[data-ongoing="true"] .compound {
+  box-shadow: inset 0 0 0 3px var(--green), inset 0 0 0 5px #0b1128;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stintBar {
+      animation: stint linear both;
+      animation-timeline: view();
+      animation-range: entry 20% entry 70%;
+    }
+
+    @keyframes stint {
+      from {
+        transform: scaleX(0);
+        opacity: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .stints {
+    padding: 12px;
+  }
+
+  .stintGrid {
+    grid-template-columns: 92px repeat(var(--years), minmax(0, 1fr));
+  }
+
+  .stintLabel span {
+    display: none;
+  }
+
+  .stintLabel b {
+    font-size: 13px;
+  }
+
+  .stintBar {
+    gap: 0;
+    padding: 0 4px;
+    font-size: 0;
+  }
+
+  .compound {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ---------- Proof map ---------- */
+
+.proofMap {
+  display: none;
+  margin: 0 0 18px;
+  padding: 16px 18px 10px;
+  background: rgba(5, 7, 15, 0.72);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+
+@media (min-width: 760px) {
+  .proofMap {
+    display: block;
+  }
+}
+
+.proofSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-body);
+}
+
+.colHead {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--ink-faint);
+}
+
+.place circle {
+  fill: rgba(245, 196, 0, 0.18);
+  stroke: var(--yellow);
+  stroke-width: 1.2;
+}
+
+.place text {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.degree {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--ink-faint);
+}
+
+.hit {
+  fill: transparent;
+}
+
+.place,
+.skillRow {
+  cursor: default;
+  transition: opacity 0.2s;
+}
+
+.link {
+  fill: none;
+  stroke: rgba(242, 243, 247, 0.3);
+  stroke-width: 1.2;
+  transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
+}
+
+.skillDot {
+  fill: var(--bg);
+  stroke: var(--ink-dim);
+  stroke-width: 1.4;
+  transition: fill 0.2s, stroke 0.2s;
+}
+
+.skillText {
+  font-size: 13.5px;
+  font-weight: 600;
+  fill: var(--ink);
+  transition: fill 0.2s;
+}
+
+.proofText {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  fill: var(--ink-dim);
+  transition: fill 0.2s;
+}
+
+/* Focus: the hovered skill or place and everything wired to it light up; the rest steps back. */
+.proofSvg [data-state="dim"] {
+  opacity: 0.2;
+}
+
+.link[data-state="lit"] {
+  stroke: var(--yellow);
+  stroke-width: 2.2;
+}
+
+.skillRow[data-state="lit"] .skillDot {
+  fill: var(--yellow);
+  stroke: var(--yellow);
+}
+
+.skillRow[data-state="lit"] .skillText {
+  fill: var(--yellow);
+}
+
+.skillRow[data-state="lit"] .proofText {
+  fill: var(--ink);
+}
+
+.place[data-state="lit"] circle {
+  fill: rgba(245, 196, 0, 0.45);
+}
+
+.place[data-state="lit"] text {
+  fill: var(--yellow);
+}
+
+/* The readout under the map. */
+.proofPanel {
+  min-height: 74px;
+  margin-top: 10px;
+  padding: 10px 14px 12px;
+  border-left: 3px solid var(--line);
+  background: rgba(242, 243, 247, 0.04);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.proofPanel[data-open="true"] {
+  border-left-color: var(--yellow);
+  background: rgba(245, 196, 0, 0.06);
+}
+
+.proofPanel p {
+  margin: 0;
+}
+
+.proofHint {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.proofTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.proofTitle b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.proofWhere {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 6px !important;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-dim);
+}
+
+.proofPlaces {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.proofPlaces i {
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(242, 243, 247, 0.07);
+  border: 1px solid var(--line);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .link {
+      stroke-dasharray: 1;
+      animation: drawLink linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 45%;
+    }
+
+    @keyframes drawLink {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+}
+
+/* ---------- Team sheet (the match channel) ---------- */
+
+.teamSheet {
+  position: relative;
+  max-width: 640px;
+  margin: 0 0 26px;
+  padding: 16px 18px 18px 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  /* Pitch markings, faint: the halfway line and the centre circle. */
+  background:
+    radial-gradient(circle at 78% 50%, transparent 54px, rgba(242, 243, 247, 0.07) 55px 56px, transparent 57px),
+    linear-gradient(90deg, transparent calc(78% - 1px), rgba(242, 243, 247, 0.07) calc(78% - 1px) 78%, transparent 78%),
+    linear-gradient(135deg, rgba(0, 77, 152, 0.3), rgba(165, 0, 68, 0.26)),
+    rgba(5, 7, 15, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+/* Blaugrana stripes down the left edge. */
+.teamSheet::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 8px;
+  background: repeating-linear-gradient(180deg, #a50044 0 14px, #004d98 14px 28px);
+}
+
+.matchChip {
+  color: #fff !important;
+  background: #a50044 !important;
+}
+
+.sheetRows {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.sheetRow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(237, 187, 0, 0.75);
+}
+
+.sheetRow dt {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.sheetRow dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}

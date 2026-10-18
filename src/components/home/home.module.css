@@ -1,0 +1,1757 @@
+/* ---------- The broadcast: one continuous page ---------- */
+
+.main {
+  position: relative;
+  --accent: var(--yellow);
+  background: radial-gradient(120% 90% at 50% 60%, #0b1026 0%, var(--bg) 60%) fixed;
+}
+
+/* The match channel: Barcelona's garnet takes over the accents. */
+.main[data-channel="match"] {
+  --accent: #c8104f;
+}
+
+/* Fixed behind everything. 100lvh so mobile toolbars collapsing don't resize it mid-scroll. */
+.canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100lvh;
+  z-index: 0;
+}
+
+/* Horizontal drags turn the car; vertical swipes still scroll the page. Important
+   because orbit controls write an inline touch-action of their own. */
+.canvas canvas {
+  touch-action: pan-y !important;
+}
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  background: url("/poster.jpg") center / cover no-repeat;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .fallback {
+    background-image: url("/poster-portrait.jpg");
+  }
+}
+
+/* Darkens the scene as the coverage scrolls in. Wide screens keep the right
+   side lighter, where the car is framed. */
+.dim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--dim, 0);
+  background: rgba(5, 7, 15, 0.86);
+}
+
+@media (min-width: 1200px) and (min-aspect-ratio: 6/5) {
+  .dim {
+    background: linear-gradient(
+      90deg,
+      rgba(5, 7, 15, 0.93) 0%,
+      rgba(5, 7, 15, 0.88) 46%,
+      rgba(5, 7, 15, 0.4) 66%,
+      rgba(5, 7, 15, 0.18) 100%
+    );
+  }
+}
+
+/* Blaugrana stadium light for the match half. */
+.glow {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-launch);
+  background:
+    radial-gradient(60% 50% at 85% 20%, rgba(0, 77, 152, 0.32), transparent 70%),
+    radial-gradient(55% 45% at 75% 90%, rgba(165, 0, 68, 0.3), transparent 70%);
+}
+
+.main[data-channel="match"] .glow {
+  opacity: 1;
+}
+
+/* ---------- Opening shot ---------- */
+
+.hero {
+  position: relative;
+  z-index: 2;
+  height: 100svh;
+  min-height: 560px;
+  pointer-events: none;
+}
+
+.heroLayer {
+  position: absolute;
+  inset: 0;
+  opacity: max(0, calc(1 - var(--hero, 0) * 1.6));
+  transform: translateY(calc(var(--hero, 0) * -8vh));
+}
+
+.heroLayer a,
+.heroLayer button {
+  pointer-events: auto;
+}
+
+/* ---------- Broadcast bar (fixed for the whole page) ---------- */
+
+.bar {
+  position: fixed;
+  z-index: 5;
+  top: var(--pad);
+  left: var(--pad);
+  right: var(--pad);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.bar a,
+.bar button {
+  pointer-events: auto;
+}
+
+/* A shade behind the bar once content scrolls beneath it. */
+.bar::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--pad) * -1) calc(var(--pad) * -1) -22px;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(5, 7, 15, 0.92), rgba(5, 7, 15, 0.55) 70%, transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.main[data-scrolled="true"] .bar::before {
+  opacity: 1;
+}
+
+.bug {
+  display: flex;
+  align-items: stretch;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.liveTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px 6px 12px;
+  background: var(--red);
+  font-weight: 700;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  animation: blink 1.2s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.channel {
+  display: grid;
+  padding: 6px 12px;
+  background: var(--panel);
+}
+
+/* The two labels share one cell and cross-fade. */
+.atStart,
+.inCoverage {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  transition: opacity 0.35s, transform 0.35s var(--ease-brake);
+}
+
+.inCoverage {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.main[data-scrolled="true"] .atStart {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.main[data-scrolled="true"] .inCoverage {
+  opacity: 1;
+  transform: none;
+}
+
+.sector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(5, 7, 15, 0.82);
+  box-shadow: inset 0 -2px 0 var(--accent);
+  white-space: nowrap;
+  animation: slideIn 0.45s var(--ease-brake) both;
+}
+
+.sector b {
+  color: var(--accent);
+}
+
+.main:not([data-scrolled="true"]) .sector {
+  display: none;
+}
+
+.clock {
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.55);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+}
+
+.channels {
+  display: flex;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.barEnd {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.audioBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.audioBtn:hover,
+.audioBtn[aria-pressed="true"] {
+  color: var(--ink);
+}
+
+.audioBtn[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+
+.audioBtn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.audioWaves {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.audioBtn[aria-pressed="true"] .audioWaves {
+  stroke: var(--accent);
+}
+
+.channelBtn {
+  padding: 8px 16px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-dim);
+  transition: color 0.3s, box-shadow 0.3s;
+}
+
+.channelBtn[aria-current="true"] {
+  color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+.channelBtn:hover {
+  color: var(--ink);
+}
+
+/* Page progress: a line across the very top that fills as you scroll. */
+.progressLine {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: background-color 0.6s;
+}
+
+/* ---------- Channel change ---------- */
+
+.osd {
+  position: fixed;
+  z-index: 6;
+  top: calc(var(--pad) + 52px);
+  right: var(--pad);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #7dff9a;
+  text-shadow: 0 0 10px rgba(125, 255, 154, 0.55);
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* A flash of analogue static as the channel flips. */
+.noise {
+  position: fixed;
+  z-index: 7;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 5px);
+  mix-blend-mode: screen;
+}
+
+/* ---------- Sector rail ---------- */
+
+.rail {
+  position: fixed;
+  z-index: 4;
+  right: clamp(14px, 2vw, 28px);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.main[data-scrolled="true"] .rail {
+  opacity: 1;
+  visibility: visible;
+}
+
+.rail ol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.railTrack {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 4px;
+  width: 1px;
+  background: var(--line);
+}
+
+.railFill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleY(var(--progress, 0));
+  transform-origin: top;
+  transition: background-color 0.6s;
+}
+
+.rail a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.railDot {
+  order: 2;
+  position: relative;
+  width: 9px;
+  height: 9px;
+  background: var(--bg);
+  border: 1px solid var(--ink-faint);
+  transform: rotate(45deg);
+  transition: background-color 0.3s, border-color 0.3s, transform 0.3s var(--ease-brake);
+}
+
+.railLabel {
+  order: 1;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  background: rgba(5, 7, 15, 0.82);
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.25s, transform 0.25s var(--ease-brake);
+}
+
+.rail a:hover .railLabel,
+.rail a:focus-visible .railLabel,
+.rail a[aria-current="true"] .railLabel {
+  opacity: 1;
+  transform: none;
+}
+
+.rail a[aria-current="true"] .railDot {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(45deg) scale(1.3);
+}
+
+@media (max-width: 1099px) {
+  .rail {
+    display: none;
+  }
+}
+
+/* ---------- Opening-shot graphics ---------- */
+
+/* Backdrop preview switcher, until a backdrop is chosen. */
+.backdrops {
+  position: absolute;
+  top: calc(var(--pad) + 100px);
+  right: var(--pad);
+  display: flex;
+  align-items: stretch;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.backdropsLabel {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-right: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.backdropBtn {
+  background: none;
+  border: 0;
+  padding: 7px 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.backdropBtn[aria-pressed="true"] {
+  box-shadow: inset 0 -3px 0 var(--yellow);
+}
+
+.backdropBtn:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: -2px;
+}
+
+/* Lower third: name, role */
+
+.lowerThird {
+  position: absolute;
+  left: var(--pad);
+  bottom: calc(var(--pad) + 44px);
+  max-width: min(640px, 60vw);
+  padding: 14px 32px 16px 18px;
+  border-left: 6px solid var(--yellow);
+  background: linear-gradient(90deg, rgba(11, 17, 40, 0.94), rgba(11, 17, 40, 0.6) 70%, rgba(11, 17, 40, 0));
+  animation: slideIn 0.7s var(--ease-brake) both;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
+}
+
+.kicker {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 6vw, 84px);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.role {
+  margin: 10px 0 0;
+  font-size: 18px;
+  color: var(--ink-dim);
+}
+
+.slot {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px dashed var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+/* Actions */
+
+.actions {
+  position: absolute;
+  right: var(--pad);
+  bottom: calc(var(--pad) + 44px);
+  display: flex;
+  gap: 10px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 24px 12px 20px;
+  border: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  transition: transform 0.25s var(--ease-brake), background-color 0.2s;
+}
+
+.primary {
+  background: var(--yellow);
+  color: #0a0a0a;
+}
+
+.secondary {
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.primary:hover,
+a.secondary:hover {
+  transform: translateY(-2px);
+}
+
+a.secondary:hover {
+  background: var(--panel-2);
+}
+
+.secondary:disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+
+.soon {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+/* HUD: interaction hint + DRS */
+
+.hud {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--pad) + 56px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s, visibility 0.6s;
+}
+
+.hud[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hint {
+  padding: 3px 8px;
+  background: rgba(5, 7, 15, 0.78);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+.drs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.drsLight {
+  width: 10px;
+  height: 10px;
+  background: #3a3f55;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.drsLight[data-open="true"] {
+  background: var(--green);
+  box-shadow: 0 0 12px var(--green);
+}
+
+/* Scroll cue: a line that keeps running down, centred above the ticker. */
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  width: 24px;
+  height: 46px;
+  margin-left: -12px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s 0.6s;
+}
+
+.cue[data-visible="true"] {
+  opacity: 1;
+}
+
+.cueLine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  margin-left: -1px;
+  background: linear-gradient(180deg, transparent, var(--yellow));
+  animation: cue 1.8s var(--ease-launch) infinite;
+}
+
+@keyframes cue {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.disclaimer {
+  position: absolute;
+  left: var(--pad);
+  bottom: 42px;
+  margin: 0;
+  max-width: 460px;
+  padding: 2px 6px;
+  /* Stays readable over the bright track photos. */
+  background: rgba(5, 7, 15, 0.78);
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+.wideOnly {
+  display: inline;
+}
+
+/* ---------- Ticker ---------- */
+
+.ticker {
+  position: fixed;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  /* Near-opaque so the coverage scrolling underneath doesn't show through the crawl. */
+  background: rgba(5, 7, 15, 0.95);
+  border-top: 1px solid var(--line);
+  pointer-events: none;
+}
+
+.tickerTrack {
+  display: flex;
+  white-space: nowrap;
+  animation: ticker 40s linear infinite;
+  will-change: transform;
+}
+
+.tickerRow {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tickerRow li {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+}
+
+.tickerRow li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-right: 18px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  transition: background-color 0.6s;
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- Start lights ---------- */
+
+.lights {
+  position: absolute;
+  top: clamp(72px, 14vh, 140px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+  transition: opacity 0.7s var(--ease-launch), transform 0.7s var(--ease-launch);
+}
+
+.lights[data-state="out"] {
+  opacity: 0;
+  transform: translate(-50%, -18px);
+  transition-delay: 0.35s;
+}
+
+.gantry {
+  display: flex;
+  gap: clamp(8px, 1.4vw, 16px);
+  padding: 14px 18px;
+  background: #090a0f;
+  border: 1px solid #1c1f2b;
+  border-radius: 6px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.pod {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  background: #11131d;
+  border-radius: 4px;
+}
+
+.lamp {
+  width: clamp(20px, 2.6vw, 36px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a1818, #160808 70%);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.lamp[data-on="true"] {
+  background: radial-gradient(circle at 35% 30%, #ff9a8a, #ff1f1f 45%, #b30000 78%);
+  box-shadow: 0 0 18px rgba(255, 30, 30, 0.8), 0 0 44px rgba(255, 0, 0, 0.45);
+}
+
+.caption {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.skip {
+  background: none;
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+
+.skip:hover {
+  color: var(--ink);
+}
+
+/* ---------- The lap ---------- */
+
+.lap {
+  position: relative;
+  z-index: 2;
+}
+
+/* Driven: a long scroll track, with the captions pinned over the 3D lap. */
+.lap[data-mode="drive"] {
+  height: calc(var(--segments, 15) * 50svh + 100svh);
+}
+
+.lapStage {
+  position: relative;
+  padding: clamp(80px, 12vh, 120px) var(--pad) 64px;
+}
+
+.lap[data-mode="drive"] .lapStage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  padding: 0;
+  pointer-events: none;
+}
+
+.lapHead {
+  margin-bottom: 28px;
+}
+
+.lap[data-mode="drive"] .lapHead {
+  position: absolute;
+  top: calc(var(--pad) + 56px);
+  left: var(--pad);
+  margin: 0;
+}
+
+.lap[data-mode="drive"] .lapKicker,
+.lap[data-mode="drive"] .lapTitle {
+  transition: opacity 0.4s, transform 0.4s var(--ease-brake);
+}
+
+.lap[data-mode="drive"][data-racing="true"] .lapKicker,
+.lap[data-mode="drive"][data-racing="true"] .lapTitle {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.lapKicker {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.lapTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 3.4vw, 40px);
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+}
+
+.lapSkip {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  background: rgba(5, 7, 15, 0.7);
+  border: 1px solid var(--line);
+  pointer-events: auto;
+}
+
+.lapSkip:hover {
+  border-color: var(--yellow);
+}
+
+/* The list: a plain grid of milestone cards (no WebGL, reduced motion, before hydration). */
+.lapCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lapCard {
+  position: relative;
+  padding: 16px 20px 18px;
+  background: rgba(11, 17, 40, 0.9);
+  border-left: 6px solid var(--yellow);
+}
+
+.lapCard[data-edge="true"] {
+  border-left-color: var(--red);
+}
+
+.lapTurn {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.lapTurn b {
+  color: var(--yellow);
+  font-weight: 600;
+}
+
+.lapHeadline {
+  display: block;
+  margin: 6px 0 2px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.lapCardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.lapDetail {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+/* The milestone's data graphic, under its caption. */
+.lapGraphic {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* Driven: one caption at a time, as a broadcast lower third. */
+.lap[data-mode="drive"] .lapCards {
+  position: absolute;
+  left: var(--pad);
+  bottom: calc(var(--pad) + 40px);
+  display: grid;
+  width: min(520px, calc(100vw - 2 * var(--pad)));
+}
+
+.lap[data-mode="drive"] .lapCard {
+  grid-area: 1 / 1;
+  align-self: end;
+  opacity: 0;
+  transform: translateX(-18px);
+  transition: opacity 0.35s, transform 0.45s var(--ease-brake);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.lap[data-mode="drive"] .lapCard[data-active="true"] {
+  opacity: 1;
+  transform: none;
+  /* The caption on screen takes the pointer, so its explained terms and skills can be hovered. */
+  pointer-events: auto;
+}
+
+/* What the headline counts, beside the number. */
+.lapUnit {
+  display: inline-block;
+  margin-left: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  vertical-align: 0.5em;
+  color: var(--yellow);
+}
+
+/* Skills proven at this milestone. */
+.lapSkills {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.lapSkillsLabel {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.lapSkills ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lapSkills li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: rgba(25, 195, 107, 0.1);
+  border: 1px solid rgba(25, 195, 107, 0.35);
+}
+
+.lapSkills li[data-state="known"] {
+  color: var(--ink-dim);
+  background: rgba(242, 243, 247, 0.05);
+  border-color: var(--line);
+}
+
+.lapSkills li[data-state="elsewhere"] {
+  color: var(--ink-dim);
+  background: none;
+  border-style: dashed;
+}
+
+.lapSkills li[data-state="new"] {
+  box-shadow: 0 0 0 1px rgba(25, 195, 107, 0.5), 0 0 18px rgba(25, 195, 107, 0.25);
+}
+
+.newTag,
+.elsewhereTag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.newTag {
+  padding: 1px 5px;
+  color: #04140b;
+  background: var(--green);
+}
+
+.elsewhereTag {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ink-faint);
+}
+
+/* New skills land with a flash as their caption comes up. */
+.lap[data-mode="drive"] .lapCard[data-active="true"] .lapSkills li[data-state="new"] {
+  animation: skillIn 0.7s var(--ease-brake) both;
+}
+
+.lap[data-mode="drive"] .lapCard[data-active="true"] .lapSkills li:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.lap[data-mode="drive"] .lapCard[data-active="true"] .lapSkills li:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+@keyframes skillIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+    box-shadow: 0 0 0 1px rgba(25, 195, 107, 0.9), 0 0 40px rgba(25, 195, 107, 0.8);
+  }
+}
+
+/* The cinematic layer: letterbox bars and a vignette, eased in with the car's speed (--cine). */
+.lapCine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 75% at 50% 48%, transparent 58%, rgb(0 0 0 / calc(var(--cine, 0) * 0.55)) 100%);
+}
+
+.lapCine::before,
+.lapCine::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8vh;
+  background: #000;
+  transform: scaleY(var(--cine, 0));
+}
+
+.lapCine::before {
+  top: 0;
+  transform-origin: top;
+}
+
+.lapCine::after {
+  bottom: 0;
+  transform-origin: bottom;
+}
+
+/* Track map, bottom right. */
+.lapMapBox {
+  position: absolute;
+  right: calc(var(--pad) + 36px);
+  bottom: calc(var(--pad) + 40px);
+  padding: 10px 12px 8px;
+  background: rgba(5, 7, 15, 0.72);
+  border: 1px solid var(--line);
+}
+
+.map {
+  display: block;
+  width: 200px;
+  height: 150px;
+}
+
+.mapTrack {
+  fill: none;
+  stroke: rgba(242, 243, 247, 0.16);
+  stroke-width: 7;
+  stroke-linejoin: round;
+}
+
+.mapLine {
+  fill: none;
+  stroke: rgba(242, 243, 247, 0.7);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.mapStart {
+  fill: #f2f3f7;
+}
+
+.mapTick {
+  fill: var(--ink-faint);
+  transition: r 0.3s;
+}
+
+.mapTick[data-on="true"] {
+  fill: var(--yellow);
+}
+
+.mapCar {
+  fill: var(--red);
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.lapCounter {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--ink-dim);
+}
+
+/* Counter between the previous / next milestone buttons. */
+.lapCounterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.lapCounterRow .lapCounter {
+  margin: 0;
+}
+
+.lapStep {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 24px;
+  padding: 0 0 2px;
+  border: 1px solid var(--line);
+  background: rgba(242, 243, 247, 0.06);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.lapStep:hover:not(:disabled) {
+  border-color: var(--yellow);
+  background: rgba(245, 196, 0, 0.12);
+}
+
+.lapStep:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+/* Skills proven so far on the lap: one segment per skill. */
+.skillMeter {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.skillMeterHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.skillMeterHead b {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.skillMeterHead small {
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+
+.skillSegments {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 3px;
+}
+
+.skillSegments i {
+  height: 8px;
+  background: rgba(242, 243, 247, 0.1);
+  transition: background-color 0.3s;
+}
+
+.skillSegments i[data-on="true"] {
+  background: var(--green);
+}
+
+.skillSegments i[data-new="true"] {
+  animation: segmentIn 0.9s var(--ease-brake) both;
+}
+
+@keyframes segmentIn {
+  0% {
+    background: #b8ffd6;
+    box-shadow: 0 0 14px rgba(25, 195, 107, 0.9);
+    transform: scaleY(1.8);
+  }
+}
+
+/* Onboard telemetry, above the track map. */
+.telemetry {
+  --rpm: 0;
+  --thr: 0;
+  --brk: 0;
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tmLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.tmMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tmSpeed {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.tmSpeed b {
+  min-width: 3ch;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tmSpeed small {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.tmGear {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: #0a0a0a;
+  background: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+/* Shift lights: green, red, then blue at the limit; lit from the left with the revs. */
+.tmLeds {
+  position: relative;
+  height: 7px;
+  background: repeating-linear-gradient(90deg, rgba(242, 243, 247, 0.12) 0 10px, transparent 10px 13px);
+}
+
+.tmLedsLit {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 10px, rgba(5, 7, 15, 1) 10px 13px),
+    linear-gradient(90deg, var(--green) 0 40%, var(--red) 40% 80%, #3b82f6 80%);
+  clip-path: inset(0 calc((1 - var(--rpm)) * 100%) 0 0);
+  box-shadow: 0 0 10px rgba(25, 195, 107, 0.35);
+}
+
+.tmPedals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.tmPedal {
+  position: relative;
+  height: 5px;
+  overflow: hidden;
+  background: rgba(242, 243, 247, 0.1);
+}
+
+.tmPedal i {
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+}
+
+.tmPedal[data-pedal="throttle"] i {
+  background: var(--green);
+  transform: scaleX(var(--thr));
+}
+
+.tmPedal[data-pedal="brake"] i {
+  background: var(--red);
+  transform: scaleX(var(--brk));
+}
+
+/* Dip to black while the 3D set changes underneath. */
+.cut {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Small screens ---------- */
+
+/* Narrower bars: the audio button goes icon-only, then the clock steps out, so the
+   sector name and the channel switch always fit on one line. */
+@media (max-width: 1100px) {
+  .audioBtn {
+    padding: 7px 9px;
+  }
+
+  .audioLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 960px) {
+  .clock {
+    display: none;
+  }
+}
+
+/* Mid-width screens: a narrower caption, so the car in the middle of the frame stays clear of it. */
+@media (min-width: 721px) and (max-width: 1199px) {
+  .lap[data-mode="drive"] .lapCards {
+    width: min(520px, 40vw);
+  }
+}
+
+@media (max-width: 960px) {
+  .hint {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .bar {
+    flex-wrap: wrap;
+  }
+
+  .clock {
+    display: none;
+  }
+
+  /* Once the coverage is rolling: just the bug and the sector, no channel row. */
+  .main[data-scrolled="true"] .channels {
+    display: none;
+  }
+
+  /* A long gantry title shortens with an ellipsis rather than pushing the audio button onto a second row. */
+  .main[data-scrolled="true"] .bar {
+    flex-wrap: nowrap;
+  }
+
+  .main[data-scrolled="true"] .bug {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .main[data-scrolled="true"] .sector {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Audio: the icon only. */
+  .audioBtn {
+    padding: 6px 8px;
+  }
+
+  .audioLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .main[data-scrolled="true"] .channel {
+    display: none;
+  }
+
+  .lowerThird {
+    right: var(--pad);
+    max-width: none;
+    bottom: calc(var(--pad) + 92px);
+  }
+
+  .actions {
+    left: var(--pad);
+    bottom: calc(var(--pad) + 44px);
+  }
+
+  .primary,
+  .secondary {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 10px;
+    font-size: 15px;
+  }
+
+  .wideOnly {
+    display: none;
+  }
+
+  .hud {
+    top: auto;
+    bottom: calc(var(--pad) + 250px);
+  }
+
+  .cue {
+    display: none;
+  }
+
+  .backdrops {
+    top: calc(var(--pad) + 84px);
+    left: var(--pad);
+  }
+
+  .backdropsLabel {
+    display: none;
+  }
+
+  .backdropBtn {
+    flex: 1;
+    padding: 7px 4px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .osd {
+    top: calc(var(--pad) + 40px);
+    font-size: 15px;
+  }
+
+  /* Leave room for the track map in the top right (112px map + padding + a gap). */
+  .lap[data-mode="drive"] .lapHead {
+    top: calc(var(--pad) + 44px);
+    right: calc(var(--pad) + 142px);
+  }
+
+  .lapTitle {
+    font-size: 24px;
+  }
+
+  .lapKicker {
+    letter-spacing: 0.1em;
+    text-wrap: balance;
+  }
+
+  .lap[data-mode="drive"] .lapCards {
+    bottom: calc(var(--pad) + 34px);
+  }
+
+  .lapDetail {
+    font-size: 14px;
+  }
+
+  .lapGraphic {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  /* On the lap the gantry already shows the headline; the caption keeps the detail and the graphic. */
+  .lap[data-mode="drive"] .lapHeadline {
+    display: none;
+  }
+
+  .lap[data-mode="drive"] .lapCardTitle {
+    margin-top: 4px;
+  }
+
+  .lapMapBox {
+    top: calc(var(--pad) + 44px);
+    right: var(--pad);
+    bottom: auto;
+    padding: 6px 8px 4px;
+  }
+
+  .map {
+    width: 112px;
+    height: 84px;
+  }
+
+  /* Phones keep the skills meter and the ‹ › counter, and drop the mini map, so the gantry board below has the room. */
+  .lap[data-mode="drive"] .map {
+    display: none;
+  }
+
+  /* Prev / next and the counter fit the 112px map width. */
+  .lapCounterRow {
+    gap: 4px;
+  }
+
+  .lapStep {
+    width: 22px;
+    height: 22px;
+    font-size: 16px;
+  }
+
+  .lapCounterRow .lapCounter {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  /* Phones: the skills meter takes the telemetry's place, so the panel doesn't grow into the gantry. */
+  .telemetry {
+    display: none;
+  }
+
+  .skillMeter {
+    gap: 3px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+  }
+
+  .skillMeterHead {
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+  }
+
+  .skillMeterHead b {
+    font-size: 15px;
+  }
+
+  .skillMeterHead small {
+    font-size: 11px;
+  }
+
+  .skillSegments {
+    gap: 2px;
+  }
+
+  .skillSegments i {
+    height: 6px;
+  }
+
+  /* Compact skill chips in the caption. */
+  .lapSkills {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  /* A phone caption carries the skills or the graphic, not both, so the car stays in view above it. */
+  .lap[data-mode="drive"] .lapCard:has(.lapSkills) .lapGraphic {
+    display: none;
+  }
+
+  .lapSkillsLabel {
+    margin-bottom: 5px;
+    font-size: 9.5px;
+  }
+
+  .lapSkills ul {
+    gap: 4px;
+  }
+
+  .lapSkills li {
+    padding: 3px 7px;
+    font-size: 12.5px;
+  }
+
+  .tmLabel,
+  .tmLeds,
+  .tmPedals {
+    display: none;
+  }
+
+  .tmSpeed b {
+    font-size: 22px;
+  }
+
+  .tmSpeed small {
+    font-size: 9px;
+  }
+
+  .tmGear {
+    width: 24px;
+    height: 24px;
+    font-size: 17px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+  }
+}
+
+/* Short phone screens: the caption alone on the lap, so it doesn't cover the car. */
+@media (max-width: 720px) and (max-height: 700px) {
+  .lap[data-mode="drive"] .lapGraphic {
+    display: none;
+  }
+}

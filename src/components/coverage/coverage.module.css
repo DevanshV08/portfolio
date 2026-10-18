@@ -1,0 +1,924 @@
+/* Highlights — the broadcast graphics package. Plain HTML, no 3D, fast.
+   Bold but disciplined: strong type, meaningful colour, telemetry motifs.
+   Shared by the home page (over the 3D scene) and /highlights. */
+
+.page {
+  position: relative;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 56px;
+  /* Faint carbon weave so the dark background isn't a flat void. */
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0 2px, transparent 2px 6px),
+    radial-gradient(120% 60% at 50% -10%, rgba(75, 45, 143, 0.18), transparent 60%);
+}
+
+/* Championship stripe pinned to the very top. */
+.topstripe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 10;
+  background: linear-gradient(90deg, var(--red) 0 33%, var(--navy) 33% 66%, var(--yellow) 66% 100%);
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  padding: clamp(28px, 5vw, 56px) 0 32px;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: clamp(24px, 5vw, 44px);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.kicker {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.heroMain {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 3vw, 32px);
+}
+
+/* The 2013 No. 1 as a huge ghost numeral, tying back to the home page. */
+.ghost {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(120px, 22vw, 240px);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(245, 196, 0, 0.26);
+  user-select: none;
+}
+
+.heroText {
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 9vw, 112px);
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  animation: slide 0.7s var(--ease-brake) both;
+}
+
+.role {
+  margin: 14px 0 0;
+  padding-left: 14px;
+  border-left: 5px solid var(--yellow);
+  font-size: clamp(17px, 2.4vw, 22px);
+  color: var(--ink);
+  animation: slide 0.7s 0.08s var(--ease-brake) both;
+}
+
+.where {
+  color: var(--ink-faint);
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+}
+
+/* ---------- Pit board (contact links) ---------- */
+
+.pitboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pitboard a,
+.pitboard .slot {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--line);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  transition: transform 0.2s var(--ease-brake), background-color 0.2s;
+}
+
+.pitboard li:first-child a {
+  background: var(--yellow);
+  color: #0a0a0a;
+  box-shadow: none;
+}
+
+.pitboard a:hover {
+  transform: translateY(-2px);
+  background: var(--panel-2);
+}
+
+.pitboard li:first-child a:hover {
+  background: var(--yellow);
+}
+
+/* ---------- Stat band ---------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2px;
+  margin: 8px 0 8px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 20px;
+  background: var(--bg);
+  border-top: 3px solid var(--accent, var(--yellow));
+}
+
+.stats .stat:nth-child(5n + 1) {
+  --accent: #b14cff;
+}
+.stats .stat:nth-child(5n + 2) {
+  --accent: var(--green);
+}
+.stats .stat:nth-child(5n + 3) {
+  --accent: var(--yellow);
+}
+.stats .stat:nth-child(5n + 4) {
+  --accent: #38bdf8;
+}
+.stats .stat:nth-child(5n + 5) {
+  --accent: var(--red);
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 0.9;
+  color: var(--accent, var(--yellow));
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ---------- Section head ---------- */
+
+.section {
+  padding: clamp(36px, 6vw, 56px) 0 0;
+  /* Anchor jumps land below the fixed broadcast bar. */
+  scroll-margin-top: 64px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 24px;
+}
+
+.headIndex {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--yellow);
+}
+
+.headTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.headRule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--yellow) 0 36px, var(--line) 36px);
+}
+
+.lead {
+  margin: 0;
+  font-size: clamp(19px, 2.6vw, 25px);
+  line-height: 1.5;
+  max-width: 40ch;
+  font-weight: 500;
+}
+
+/* The thesis's three calls, each pointing at its project. */
+.calls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 10px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.call {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px 12px;
+  background: rgba(25, 195, 107, 0.07);
+  border-left: 2px solid var(--green);
+}
+
+.broadcast .call {
+  background: rgba(9, 22, 22, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.callLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.callText {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.callLink {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-dim);
+  text-decoration: none;
+}
+
+.callLink b {
+  margin-right: 4px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--yellow);
+}
+
+.callLink:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* Project cards land below the fixed broadcast bar when jumped to. */
+.card {
+  scroll-margin-top: 84px;
+}
+
+/* ---------- Selected work ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 22px 24px;
+  background: linear-gradient(180deg, var(--panel), #090d1f);
+  /* Visible, so glossary tooltips can open past the card's edge. */
+  overflow: visible;
+  transition: transform 0.25s var(--ease-brake);
+}
+
+/* Livery stripe down the left edge. */
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--yellow), var(--red));
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* Above its neighbours while hovered or focused, so an open glossary tip isn't covered. */
+.card:hover,
+.card:focus-within {
+  z-index: 3;
+}
+
+.cardTop {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.pos {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--yellow);
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.cardTitle {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 23px;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.cardTitle a {
+  text-decoration: none;
+}
+
+.cardTitle a:hover {
+  color: var(--yellow);
+}
+
+.cardSummary {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* "The call" as a clipped team-radio transmission. */
+.radio {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  background: rgba(25, 195, 107, 0.07);
+  border-left: 2px solid var(--green);
+}
+
+.radioLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.radio p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.readout {
+  margin: 14px 0 0;
+  padding-left: 14px;
+  border-left: 3px solid var(--yellow);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+.stack li {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Data graphics inside cards and awards. */
+.cardGraphic {
+  margin: 16px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.awardGraphic {
+  margin: 12px 0 4px;
+  max-width: 460px;
+}
+
+.researchGraphic {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  max-width: 620px;
+  background: rgba(5, 7, 15, 0.6);
+  border: 1px solid var(--line);
+}
+
+/* ---------- Experience / awards timeline ---------- */
+
+.timeline,
+.awards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stint,
+.award {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 20px;
+  padding: 0 0 26px 0;
+  position: relative;
+}
+
+/* Running timing line with a node per entry. */
+.stint::before,
+.award::before {
+  content: "";
+  position: absolute;
+  left: 150px;
+  top: 7px;
+  width: 9px;
+  height: 9px;
+  margin-left: -4px;
+  background: var(--yellow);
+  transform: rotate(45deg);
+}
+
+.timeline .stint:not(:last-child)::after,
+.awards .award:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 150px;
+  top: 16px;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.stintBody,
+.award > div {
+  padding-left: 22px;
+  padding-bottom: 2px;
+}
+
+.year {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  text-align: right;
+  padding-top: 2px;
+  padding-right: 18px;
+}
+
+.stintTitle {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.01em;
+}
+
+.org {
+  color: var(--ink-dim);
+  font-weight: 500;
+}
+
+.stint p,
+.award p {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+/* ---------- Research ---------- */
+
+.papers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.paper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.paper:first-child {
+  border-top: 0;
+}
+
+.paperTitle {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.read {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.read:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Skills ---------- */
+
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.skill {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  background: var(--bg);
+}
+
+.skillName {
+  font-weight: 600;
+}
+
+.skillAbout {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+
+.proof {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+
+/* ---------- About (the football half of the broadcast) ---------- */
+
+.about .headRule {
+  background: linear-gradient(90deg, #a50044 0 36px, var(--line) 36px);
+}
+
+.about .headIndex {
+  color: #a50044;
+}
+
+.aboutBody {
+  max-width: 64ch;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.aboutBody p {
+  margin: 0 0 16px;
+}
+
+.aboutLead {
+  padding-left: 16px;
+  border-left: 3px solid #a50044;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(20px, 3vw, 27px) !important;
+  line-height: 1.35 !important;
+  color: var(--ink);
+}
+
+/* ---------- Contact ---------- */
+
+.contact {
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.contact li {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.contact li:first-child {
+  border-top: 0;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ---------- Empty slot + footer ---------- */
+
+.slot {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px dashed var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.footer {
+  margin-top: clamp(40px, 7vw, 72px);
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.footer a {
+  color: var(--ink-dim);
+}
+
+/* ---------- Scroll reveal (progressive, pure CSS, no-JS safe) ---------- */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stat,
+    .stint,
+    .award,
+    .paper,
+    .skill,
+    .lead,
+    .aboutBody p {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+
+    /* Cards come in one after another, like cars crossing the line. */
+    .card {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry var(--stagger, 0%) entry calc(30% + var(--stagger, 0%));
+    }
+
+    /* Headings wipe in like a broadcast graphic, and the rule draws across. */
+    .headTitle {
+      animation: wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 45%;
+    }
+
+    .headRule {
+      transform-origin: left;
+      animation: draw linear both;
+      animation-timeline: view();
+      animation-range: entry 15% entry 60%;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+    }
+
+    @keyframes wipe {
+      from {
+        clip-path: inset(0 100% 0 0);
+        transform: translateX(-12px);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    @keyframes draw {
+      from {
+        transform: scaleX(0);
+      }
+    }
+  }
+}
+
+/* ---------- Broadcast layout: the coverage over the 3D scene ---------- */
+
+.body {
+  position: relative;
+}
+
+.broadcast {
+  z-index: 2;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 0 var(--pad) 120px;
+}
+
+/* Cards and panels turn to smoked glass so the scene still reads through. */
+.broadcast .card {
+  background: linear-gradient(180deg, rgba(11, 17, 40, 0.82), rgba(9, 13, 31, 0.86));
+  backdrop-filter: blur(10px);
+}
+
+.broadcast .stats,
+.broadcast .skills {
+  background: rgba(242, 243, 247, 0.1);
+}
+
+.broadcast .stat,
+.broadcast .skill {
+  background: rgba(5, 7, 15, 0.74);
+  backdrop-filter: blur(8px);
+}
+
+.broadcast .stats {
+  margin-top: 0;
+  scroll-margin-top: 84px;
+}
+
+/* In the narrower broadcast column: three on top, two below, rather than four and an orphan. */
+@media (min-width: 700px) {
+  .broadcast .stats {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .broadcast .stat {
+    grid-column: span 2;
+  }
+
+  .broadcast .stat:nth-child(4):nth-last-child(2),
+  .broadcast .stat:nth-child(5):nth-last-child(1) {
+    grid-column: span 3;
+  }
+}
+
+/* Wide screens: the coverage takes the left of the frame, the car the right. */
+@media (min-width: 1200px) and (min-aspect-ratio: 6/5) {
+  .broadcast {
+    width: min(780px, 54vw);
+    margin-left: clamp(32px, 6vw, 112px);
+  }
+}
+
+.contactSector .pitboard {
+  margin-top: 8px;
+}
+
+.finish {
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(30px, 5vw, 56px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .ghost {
+    display: none;
+  }
+
+  .stint,
+  .award {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .stint::before,
+  .award::before,
+  .timeline .stint:not(:last-child)::after,
+  .awards .award:not(:last-child)::after {
+    display: none;
+  }
+
+  .stintBody,
+  .award > div {
+    padding-left: 0;
+  }
+
+  .year {
+    text-align: left;
+  }
+
+  .paper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .contact li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* Wide screens show the proof map instead; the list stays for screen readers.
+   (Last in the file so it wins over the list's own layout.) */
+@media (min-width: 760px) {
+  .skills {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
